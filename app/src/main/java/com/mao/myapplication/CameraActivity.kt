@@ -16,9 +16,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import com.mao.myapplication.databinding.ActivityCameraBinding
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -33,7 +31,7 @@ class CameraActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
 
-    private lateinit var cypherViewModel: ViewModel
+    private lateinit var cypherViewModel: CypherViewModel
 
     private val activityResultLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -59,7 +57,7 @@ class CameraActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         // Set up ViewModel
-        cypherViewModel = ViewModelProvider(this).get(CypherViewModel::class.java)
+        cypherViewModel = ViewModelProvider(this)[CypherViewModel::class.java]
 
 
         // Request camera permissions
@@ -70,10 +68,17 @@ class CameraActivity : AppCompatActivity() {
         }
 
         // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
+        viewBinding.imageCaptureButton.setOnClickListener {
+            takePhoto()
+            cypherInput()
+        }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun cypherInput() {
+        cypherViewModel.cypherText("hola")
     }
 
     private fun takePhoto() {}
@@ -89,8 +94,8 @@ class CameraActivity : AppCompatActivity() {
 
             // Preview
             val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-                }
+                it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+            }
 
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
