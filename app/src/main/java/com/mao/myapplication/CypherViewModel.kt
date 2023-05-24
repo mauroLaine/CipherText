@@ -9,6 +9,7 @@ import androidx.security.crypto.MasterKeys
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 
 class CypherViewModel(private val applicationContext: Application) :
     AndroidViewModel(applicationContext) {
@@ -18,12 +19,16 @@ class CypherViewModel(private val applicationContext: Application) :
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
         val fileToWrite = "my_sensitive_data.txt"
+        val file = File(
+            applicationContext.getExternalFilesDir(
+                Environment.DIRECTORY_DOCUMENTS
+            ), fileToWrite
+        )
+        val result = Files.deleteIfExists(file.toPath())
+        Log.d("###", result.toString())
+
         val encryptedFile = EncryptedFile.Builder(
-            File(
-                applicationContext.getExternalFilesDir(
-                    Environment.DIRECTORY_DOCUMENTS
-                ), fileToWrite
-            ),
+            file,
             applicationContext,
             mainKeyAlias,
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB

@@ -70,8 +70,7 @@ class CameraActivity : AppCompatActivity() {
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener {
             takePhoto()
-            //encryptInput()
-            decryptInput()
+            encryptInput()
         }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
 
