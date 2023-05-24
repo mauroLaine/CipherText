@@ -70,15 +70,20 @@ class CameraActivity : AppCompatActivity() {
         // Set up the listeners for take photo and video capture buttons
         viewBinding.imageCaptureButton.setOnClickListener {
             takePhoto()
-            cypherInput()
+            //encryptInput()
+            decryptInput()
         }
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    private fun cypherInput() {
-        cypherViewModel.cypherText("hola")
+    private fun encryptInput() {
+        cypherViewModel.encryptInputText("hola")
+    }
+
+    private fun decryptInput() {
+        cypherViewModel.decryptInputText()
     }
 
     private fun takePhoto() {}
