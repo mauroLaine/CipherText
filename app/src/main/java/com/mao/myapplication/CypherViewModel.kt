@@ -3,6 +3,7 @@ package com.mao.myapplication
 import android.app.Application
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
@@ -27,18 +28,22 @@ class CypherViewModel(private val applicationContext: Application) :
         val result = Files.deleteIfExists(file.toPath())
         Log.d("###", result.toString())
 
-        val encryptedFile = EncryptedFile.Builder(
-            file,
-            applicationContext,
-            mainKeyAlias,
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-        ).build()
+        if (result) {
+            val encryptedFile = EncryptedFile.Builder(
+                file,
+                applicationContext,
+                mainKeyAlias,
+                EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            ).build()
 
-        val fileContent = text.toByteArray(StandardCharsets.UTF_8)
-        encryptedFile.openFileOutput().apply {
-            write(fileContent)
-            flush()
-            close()
+            val fileContent = text.toByteArray(StandardCharsets.UTF_8)
+            encryptedFile.openFileOutput().apply {
+                write(fileContent)
+                flush()
+                close()
+            }
+        } else {
+            Toast.makeText(applicationContext, applicationContext.getString(R.string.file_failure),Toast.LENGTH_SHORT).show()
         }
     }
 
