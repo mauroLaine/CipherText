@@ -1,7 +1,9 @@
 package com.mao.myapplication
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -118,9 +120,15 @@ class CameraActivity : AppCompatActivity() {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, msg)
+                    val savedUri = output.savedUri
+                    // Create an intent to pass back the value to the MainActivity
+                    val intent = Intent().apply {
+                        putExtra("savedUri", savedUri.toString())
+                    }
+                    setResult(Activity.RESULT_OK, intent)
+
+                    // Finish the CameraActivity
+                    finish()
                 }
             })
 
