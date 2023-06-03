@@ -16,7 +16,6 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        private const val CAMERA_REQUEST_CODE = 1
         const val MESSAGE = "Message"
     }
 

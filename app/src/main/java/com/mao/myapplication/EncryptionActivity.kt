@@ -14,5 +14,10 @@ class EncryptionActivity : AppCompatActivity() {
         binding = ActivityEncryptionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val intent = intent
+        val value = intent.getStringExtra(MainActivity.MESSAGE)
+
+
+
     }
 }
