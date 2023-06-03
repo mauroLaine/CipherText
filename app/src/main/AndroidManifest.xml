@@ -29,5 +29,9 @@
             android:name=".CameraActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".EncryptionActivity"
+            android:exported="true">
+        </activity>
     </application>
 </manifest>

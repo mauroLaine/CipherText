@@ -17,6 +17,7 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
     companion object {
         private const val CAMERA_REQUEST_CODE = 1
+        const val MESSAGE = "Message"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -56,6 +57,9 @@ class MainActivity : AppCompatActivity() {
                                 val msg = "The text found was ${resultText}"
                                 Log.d("Andas", msg)
                                 Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, EncryptionActivity::class.java)
+                                intent.putExtra(MESSAGE, msg)
+                                startActivity(intent)
                             }
                             .addOnFailureListener { e ->
                                 val msg = "No text was found in this image"
