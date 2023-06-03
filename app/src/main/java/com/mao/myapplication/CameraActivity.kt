@@ -21,7 +21,6 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import com.mao.myapplication.databinding.ActivityCameraBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,8 +36,6 @@ class CameraActivity : AppCompatActivity() {
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
-
-    private lateinit var cypherViewModel: CypherViewModel
 
     private val activityResultLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -63,10 +60,6 @@ class CameraActivity : AppCompatActivity() {
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        // Set up ViewModel
-        cypherViewModel = ViewModelProvider(this)[CypherViewModel::class.java]
-
-
         // Request camera permissions
         if (allPermissionsGranted()) {
             startCamera()
@@ -81,14 +74,6 @@ class CameraActivity : AppCompatActivity() {
         viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
-    }
-
-    private fun encryptInput() {
-        cypherViewModel.encryptInputText("hola")
-    }
-
-    private fun decryptInput() {
-        cypherViewModel.decryptInputText()
     }
 
     private fun takePhoto() {

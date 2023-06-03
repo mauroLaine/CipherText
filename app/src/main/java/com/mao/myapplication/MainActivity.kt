@@ -55,9 +55,9 @@ class MainActivity : AppCompatActivity() {
                                 }
                                 val msg = "The text found was ${resultText}"
                                 Log.d("Andas", msg)
-                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+//                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                                 val intent = Intent(this, EncryptionActivity::class.java)
-                                intent.putExtra(MESSAGE, msg)
+                                intent.putExtra(MESSAGE, resultText)
                                 startActivity(intent)
                             }
                             .addOnFailureListener { e ->
