@@ -3,32 +3,31 @@ package com.mao.myapplication
 import android.app.Application
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.security.crypto.EncryptedFile
 import androidx.security.crypto.MasterKeys
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.lang.Exception
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 class CypherViewModel(private val applicationContext: Application) :
     AndroidViewModel(applicationContext) {
 
-    fun encryptInputText(text: String) {
+    fun encryptInputText(text: String): Boolean {
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
         val fileToWrite = "my_sensitive_data.txt"
         val file = File(
             applicationContext.getExternalFilesDir(
-                Environment.DIRECTORY_DOCUMENTS
+                Environment.DIRECTORY_DOWNLOADS
             ), fileToWrite
         )
         val result = Files.deleteIfExists(file.toPath())
         Log.d("###", result.toString())
-
-        if (result) {
+        try {
             val encryptedFile = EncryptedFile.Builder(
                 file,
                 applicationContext,
@@ -42,8 +41,11 @@ class CypherViewModel(private val applicationContext: Application) :
                 flush()
                 close()
             }
-        } else {
-            Toast.makeText(applicationContext, applicationContext.getString(R.string.file_failure),Toast.LENGTH_SHORT).show()
+            // Check file in /sdcard/Android/data/com.mao.myapplication/files/Download
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 

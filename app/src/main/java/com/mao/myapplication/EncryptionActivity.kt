@@ -1,7 +1,7 @@
 package com.mao.myapplication
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mao.myapplication.databinding.ActivityEncryptionBinding
@@ -24,23 +24,36 @@ class EncryptionActivity : AppCompatActivity() {
         val value = intent.getStringExtra(MainActivity.MESSAGE)
         binding.encryptionTextView.text = value
 
-        binding.buttonYes.setOnClickListener{
+        binding.buttonYes.setOnClickListener {
             value?.let {
                 encryptInput(value)
             }
         }
 
-        binding.buttonNo.setOnClickListener{
+        binding.buttonNo.setOnClickListener {
             finish()
         }
     }
 
 
     private fun encryptInput(encryptionInput: String) {
-        cypherViewModel.encryptInputText(encryptionInput)
+        val result = cypherViewModel.encryptInputText(encryptionInput)
+        showMessage(result)
     }
 
     private fun decryptInput() {
         cypherViewModel.decryptInputText()
+    }
+
+    private fun showMessage(result: Boolean) {
+        binding.encryptionTextView.visibility = View.GONE
+        binding.buttonNo.visibility = View.GONE
+        binding.buttonYes.visibility = View.GONE
+        val message = if (result) {
+            applicationContext.getString(R.string.file_successful)
+        } else {
+            applicationContext.getString(R.string.file_failure)
+        }
+        binding.textView.text = message
     }
 }
