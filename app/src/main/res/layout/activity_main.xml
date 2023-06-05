@@ -10,20 +10,19 @@
         android:id="@+id/btn_take_picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="@string/take_a_picture"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.26"
         tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="246dp"
         android:layout_height="264dp"
-        android:layout_marginTop="116dp"
+        android:layout_marginTop="68dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,26 +30,42 @@
         app:srcCompat="@drawable/lock" />
 
     <RadioGroup
+        android:id="@+id/radioGroup"
         android:layout_width="204dp"
         android:layout_height="55dp"
+        android:layout_marginBottom="68dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_take_picture">
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent">
 
         <RadioButton
             android:id="@+id/radio_encryption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/encryption"
-            android:checked="true"/>
+            android:checked="true"
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/encryption" />
 
         <RadioButton
             android:id="@+id/radio_decryption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="onRadioButtonClicked"
             android:text="@string/decryption" />
     </RadioGroup>
+
+    <Button
+        android:id="@+id/btn_open_file"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/open_file"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_take_picture"
+        app:layout_constraintVertical_bias="0.088" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

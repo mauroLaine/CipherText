@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
@@ -50,7 +51,11 @@ class CypherViewModel(private val applicationContext: Application) :
                 close()
             }
             // Check file in /sdcard/Android/data/com.mao.myapplication/files/Download
-            createAndDownloadFile(applicationContext, "my_sensitive_data2.txt", fileContent.toString())
+            createAndDownloadFile(
+                applicationContext,
+                "my_sensitive_data2.txt",
+                fileContent.toString()
+            )
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -58,7 +63,7 @@ class CypherViewModel(private val applicationContext: Application) :
         }
     }
 
-    fun decryptInputText() {
+    fun decryptInputText(uri: Uri): String {
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
@@ -66,13 +71,22 @@ class CypherViewModel(private val applicationContext: Application) :
         val encryptedFile = EncryptedFile.Builder(
             File(
                 applicationContext.getExternalFilesDir(
-                    Environment.DIRECTORY_DOCUMENTS
+                    Environment.DIRECTORY_DOWNLOADS
                 ), fileToRead
             ),
             applicationContext,
             mainKeyAlias,
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build()
+
+//        val encryptedFile = EncryptedFile.Builder(
+//            File(
+//                uri.path
+//            ),
+//            applicationContext,
+//            mainKeyAlias,
+//            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+//        ).build()
 
         val inputStream = encryptedFile.openFileInput()
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -85,6 +99,7 @@ class CypherViewModel(private val applicationContext: Application) :
         val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
         val message = String(plaintext)
         Log.d("###", message)
+        return message
     }
 
     private fun createAndDownloadFile(context: Context, fileName: String, content: String) {
@@ -108,7 +123,11 @@ class CypherViewModel(private val applicationContext: Application) :
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Toast.makeText(applicationContext, "Please grant the Notification permission", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                applicationContext,
+                "Please grant the Notification permission",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
         notificationManager.notify(0, notification)

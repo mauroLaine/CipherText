@@ -7,8 +7,11 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.widget.RadioButton
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +25,10 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val MESSAGE = "Message"
         const val MODE = "Mode"
+        const val FILE = "File"
         const val ENCRYPTION_MODE = "Encryption"
         const val DECRYPTION_MODE = "Decryption"
+        private const val REQUEST_CODE = 300
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -82,15 +87,39 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            data?.data?.also { uri ->
+                // Perform operations on the document using its URI.
+                // For instance, you can read the file using a FileInputStream.
+                Log.d("###", uri.toString())
+                val mode = getCypherMode()
+                val intent = Intent(this, EncryptionActivity::class.java)
+                intent.putExtra(MODE, mode)
+                intent.putExtra(FILE, uri.toString())
+                startActivity(intent)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.btnOpenFile.visibility = View.GONE
 
         binding.btnTakePicture.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             cameraActivityResult.launch(intent)
+        }
+
+        binding.btnOpenFile.setOnClickListener {
+            openFileChooser(this, 300)
         }
 
         if (!areNotificationsEnabled()) {
@@ -125,5 +154,41 @@ class MainActivity : AppCompatActivity() {
             return DECRYPTION_MODE
         }
         return null
+    }
+
+    fun onRadioButtonClicked(view: View) {
+        if (view is RadioButton) {
+            val checked = view.isChecked
+            when (view.getId()) {
+                R.id.radio_encryption ->
+                    if (checked) {
+                        binding.btnTakePicture.visibility = View.VISIBLE
+                        binding.btnOpenFile.visibility = View.GONE
+                    }
+
+                R.id.radio_decryption ->
+                    if (checked) {
+                        binding.btnOpenFile.visibility = View.VISIBLE
+                        binding.btnTakePicture.visibility = View.GONE
+                    }
+            }
+        }
+    }
+
+    private fun openFileChooser(activity: Activity, requestCode: Int) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "*/*"
+
+            // Optionally, specify a URI for the directory that should be opened in
+            // the system file picker when your app creates the intent.
+            val downloadsFolder =
+                DocumentsContract.buildDocumentUri(
+                    "com.android.providers.downloads.documents",
+                    "downloads"
+                )
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, downloadsFolder)
+        }
+        activity.startActivityForResult(intent, requestCode)
     }
 }

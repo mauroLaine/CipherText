@@ -12,4 +12,5 @@
     <string name="file_failure">Sorry, there was an error saving the file</string>
     <string name="encryption">Encryption</string>
     <string name="decryption">Decryption</string>
+    <string name="open_file">Open file</string>
 </resources>

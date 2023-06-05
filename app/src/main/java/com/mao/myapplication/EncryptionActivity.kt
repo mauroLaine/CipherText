@@ -1,11 +1,13 @@
 package com.mao.myapplication
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mao.myapplication.databinding.ActivityEncryptionBinding
 import com.mao.myapplication.utils.createNotificationChannel
+
 
 class EncryptionActivity : AppCompatActivity() {
 
@@ -26,6 +28,7 @@ class EncryptionActivity : AppCompatActivity() {
         val intent = intent
         val message = intent.getStringExtra(MainActivity.MESSAGE)
         val mode = intent.getStringExtra(MainActivity.MODE)
+        val uriFile = intent.getStringExtra(MainActivity.FILE)
 
         val actionMessage = if (mode.equals(MainActivity.ENCRYPTION_MODE)) {
             applicationContext.getString(R.string.encryption_question)
@@ -38,11 +41,13 @@ class EncryptionActivity : AppCompatActivity() {
         binding.encryptionTextView.text = message
 
         binding.buttonYes.setOnClickListener {
-            message?.let {
-                if (mode.equals(MainActivity.ENCRYPTION_MODE)) {
+            if (mode.equals(MainActivity.ENCRYPTION_MODE)) {
+                message?.let {
                     encryptInput(message)
-                } else if (mode.equals(MainActivity.DECRYPTION_MODE)) {
-                    decryptInput()
+                }
+            } else if (mode.equals(MainActivity.DECRYPTION_MODE)) {
+                uriFile?.let {
+                    decryptInput(uriFile)
                 }
             }
         }
@@ -58,8 +63,10 @@ class EncryptionActivity : AppCompatActivity() {
         showMessage(result)
     }
 
-    private fun decryptInput() {
-        cypherViewModel.decryptInputText()
+    private fun decryptInput(uriFile: String) {
+        val uri = Uri.parse(uriFile)
+        val result = cypherViewModel.decryptInputText(uri)
+        binding.encryptionTextView.text = "Original text: \n\n$result"
     }
 
     private fun showMessage(result: Boolean) {
