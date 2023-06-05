@@ -1,9 +1,13 @@
 package com.mao.myapplication
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.NotificationManager
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,7 +31,8 @@ class MainActivity : AppCompatActivity() {
                 val savedUriString = result.data?.getStringExtra("savedUri")
                 if (savedUriString != null) {
                     // When using Latin script library
-                    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                    val recognizer =
+                        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
                     val savedUri = Uri.parse(savedUriString)
 
                     val image: InputImage
@@ -81,5 +86,27 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, CameraActivity::class.java)
             cameraActivityResult.launch(intent)
         }
+
+        if (!areNotificationsEnabled()) {
+            showNotificationPermissionDialog();
+        }
+    }
+
+    private fun areNotificationsEnabled(): Boolean {
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.areNotificationsEnabled()
+    }
+
+    private fun showNotificationPermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Notifications Permission")
+            .setMessage("For optimal use of this application, please enable notifications.")
+            .setPositiveButton("Enable", DialogInterface.OnClickListener { dialog, which ->
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                startActivity(intent)
+            })
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 }

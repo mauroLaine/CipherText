@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.mao.myapplication.databinding.ActivityEncryptionBinding
+import com.mao.myapplication.utils.createNotificationChannel
 
 class EncryptionActivity : AppCompatActivity() {
 
@@ -19,6 +20,8 @@ class EncryptionActivity : AppCompatActivity() {
 
         // Set up ViewModel
         cypherViewModel = ViewModelProvider(this)[CypherViewModel::class.java]
+
+        createNotificationChannel(this)
 
         val intent = intent
         val value = intent.getStringExtra(MainActivity.MESSAGE)
