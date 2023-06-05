@@ -30,4 +30,27 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/lock" />
 
+    <RadioGroup
+        android:layout_width="204dp"
+        android:layout_height="55dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_take_picture">
+
+        <RadioButton
+            android:id="@+id/radio_encryption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/encryption"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/radio_decryption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/decryption" />
+    </RadioGroup>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

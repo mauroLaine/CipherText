@@ -24,12 +24,26 @@ class EncryptionActivity : AppCompatActivity() {
         createNotificationChannel(this)
 
         val intent = intent
-        val value = intent.getStringExtra(MainActivity.MESSAGE)
-        binding.encryptionTextView.text = value
+        val message = intent.getStringExtra(MainActivity.MESSAGE)
+        val mode = intent.getStringExtra(MainActivity.MODE)
+
+        val actionMessage = if (mode.equals(MainActivity.ENCRYPTION_MODE)) {
+            applicationContext.getString(R.string.encryption_question)
+        } else if (mode.equals(MainActivity.DECRYPTION_MODE)) {
+            applicationContext.getString(R.string.decryption_question)
+        } else {
+            applicationContext.getString(R.string.encryption_question)
+        }
+        binding.textView.text = actionMessage
+        binding.encryptionTextView.text = message
 
         binding.buttonYes.setOnClickListener {
-            value?.let {
-                encryptInput(value)
+            message?.let {
+                if (mode.equals(MainActivity.ENCRYPTION_MODE)) {
+                    encryptInput(message)
+                } else if (mode.equals(MainActivity.DECRYPTION_MODE)) {
+                    decryptInput()
+                }
             }
         }
 

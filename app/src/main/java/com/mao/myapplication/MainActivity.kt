@@ -21,6 +21,9 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
     companion object {
         const val MESSAGE = "Message"
+        const val MODE = "Mode"
+        const val ENCRYPTION_MODE = "Encryption"
+        const val DECRYPTION_MODE = "Decryption"
     }
 
     private lateinit var binding: ActivityMainBinding
@@ -61,8 +64,11 @@ class MainActivity : AppCompatActivity() {
                                 val msg = "The text found was ${resultText}"
                                 Log.d("Andas", msg)
 //                                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
+                                val mode = getCypherMode()
                                 val intent = Intent(this, EncryptionActivity::class.java)
                                 intent.putExtra(MESSAGE, resultText)
+                                intent.putExtra(MODE, mode)
                                 startActivity(intent)
                             }
                             .addOnFailureListener { e ->
@@ -108,5 +114,16 @@ class MainActivity : AppCompatActivity() {
             })
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun getCypherMode(): String? {
+        val encryptionRadio = binding.radioEncryption.isChecked
+        val decryptionRadio = binding.radioDecryption.isChecked
+        if (encryptionRadio) {
+            return ENCRYPTION_MODE
+        } else if (decryptionRadio) {
+            return DECRYPTION_MODE
+        }
+        return null
     }
 }
