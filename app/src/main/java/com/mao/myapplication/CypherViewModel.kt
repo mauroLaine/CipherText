@@ -17,25 +17,25 @@ import androidx.security.crypto.MasterKeys
 import com.mao.myapplication.utils.CHANNEL_ID
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 class CypherViewModel(private val applicationContext: Application) :
     AndroidViewModel(applicationContext) {
+    companion object {
+        private const val FILE_NAME = "my_sensitive_data.txt"
+    }
 
     fun encryptInputText(text: String): Boolean {
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-        val fileToWrite = "my_sensitive_data.txt"
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(
-            applicationContext.getExternalFilesDir(
-                Environment.DIRECTORY_DOWNLOADS
-            ), fileToWrite
+            path, FILE_NAME
         )
         val result = Files.deleteIfExists(file.toPath())
-        Log.d("###", result.toString())
+        Log.d("###", "deleteIfExists: $result")
         try {
             val encryptedFile = EncryptedFile.Builder(
                 file,
@@ -50,10 +50,10 @@ class CypherViewModel(private val applicationContext: Application) :
                 flush()
                 close()
             }
-            // Check file in /sdcard/Android/data/com.mao.myapplication/files/Download
+            // Check file in  /sdcard/Download or /sdcard/Android/data/com.mao.myapplication/files/Download
             createAndDownloadFile(
                 applicationContext,
-                "my_sensitive_data2.txt",
+                FILE_NAME,
                 fileContent.toString()
             )
             return true
@@ -67,7 +67,7 @@ class CypherViewModel(private val applicationContext: Application) :
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-        val fileToRead = "my_sensitive_data.txt"
+        val fileToRead = FILE_NAME
         val encryptedFile = EncryptedFile.Builder(
             File(
                 applicationContext.getExternalFilesDir(
@@ -98,18 +98,12 @@ class CypherViewModel(private val applicationContext: Application) :
 
         val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
         val message = String(plaintext)
-        Log.d("###", message)
+        Log.d("###", "message: $message")
         return message
     }
 
     private fun createAndDownloadFile(context: Context, fileName: String, content: String) {
-        // Step 1: Create a file in the external storage directory
-        val directory = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(directory, fileName)
-        FileOutputStream(file).use {
-            it.write(content.toByteArray())
-        }
-        // Step 2: Notify the user that the file has been created and downloaded
+        // Notify the user that the file has been created and downloaded
         // Note: You can further customize the notification as per your requirement
         val notificationManager = NotificationManagerCompat.from(context)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -118,6 +112,7 @@ class CypherViewModel(private val applicationContext: Application) :
             .setContentText("$fileName is downloaded to your device.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
+
         if (ActivityCompat.checkSelfPermission(
                 applicationContext,
                 Manifest.permission.POST_NOTIFICATIONS

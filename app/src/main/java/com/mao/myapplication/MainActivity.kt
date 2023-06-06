@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             data?.data?.also { uri ->
                 // Perform operations on the document using its URI.
                 // For instance, you can read the file using a FileInputStream.
-                Log.d("###", uri.toString())
+                Log.d("###", "uri: $uri")
                 val mode = getCypherMode()
                 val intent = Intent(this, EncryptionActivity::class.java)
                 intent.putExtra(MODE, mode)
