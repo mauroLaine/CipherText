@@ -24,6 +24,7 @@ class CypherViewModel(private val applicationContext: Application) :
     AndroidViewModel(applicationContext) {
     companion object {
         private const val FILE_NAME = "my_sensitive_data.txt"
+        private const val PATH = "/sdcard/Download/"
     }
 
     fun encryptInputText(text: String): Boolean {
@@ -53,8 +54,6 @@ class CypherViewModel(private val applicationContext: Application) :
             // Check file in  /sdcard/Download or /sdcard/Android/data/com.mao.myapplication/files/Download
             createAndDownloadFile(
                 applicationContext,
-                FILE_NAME,
-                fileContent.toString()
             )
             return true
         } catch (e: Exception) {
@@ -67,26 +66,20 @@ class CypherViewModel(private val applicationContext: Application) :
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-        val fileToRead = FILE_NAME
+        // /sdcard/Download/my_sensitive_data.txt
+        // content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fmy_sensitive_data.txt
+        Log.d("###", "uri: $uri")
+        Log.d("###", "path:" + uri.path)
+
+        // TODO: Fix loading uri file logic
         val encryptedFile = EncryptedFile.Builder(
             File(
-                applicationContext.getExternalFilesDir(
-                    Environment.DIRECTORY_DOWNLOADS
-                ), fileToRead
+                PATH + FILE_NAME
             ),
             applicationContext,
             mainKeyAlias,
             EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
         ).build()
-
-//        val encryptedFile = EncryptedFile.Builder(
-//            File(
-//                uri.path
-//            ),
-//            applicationContext,
-//            mainKeyAlias,
-//            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
-//        ).build()
 
         val inputStream = encryptedFile.openFileInput()
         val byteArrayOutputStream = ByteArrayOutputStream()
@@ -102,14 +95,14 @@ class CypherViewModel(private val applicationContext: Application) :
         return message
     }
 
-    private fun createAndDownloadFile(context: Context, fileName: String, content: String) {
+    private fun createAndDownloadFile(context: Context) {
         // Notify the user that the file has been created and downloaded
         // Note: You can further customize the notification as per your requirement
         val notificationManager = NotificationManagerCompat.from(context)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.cryptography)
             .setContentTitle("File Downloaded")
-            .setContentText("$fileName is downloaded to your device.")
+            .setContentText("$FILE_NAME is downloaded to your device.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
