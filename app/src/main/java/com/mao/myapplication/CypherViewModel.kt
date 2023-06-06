@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
@@ -16,25 +17,26 @@ import androidx.security.crypto.MasterKeys
 import com.mao.myapplication.utils.CHANNEL_ID
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 class CypherViewModel(private val applicationContext: Application) :
     AndroidViewModel(applicationContext) {
+    companion object {
+        private const val FILE_NAME = "my_sensitive_data.txt"
+        private const val PATH = "/sdcard/Download/"
+    }
 
     fun encryptInputText(text: String): Boolean {
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-        val fileToWrite = "my_sensitive_data.txt"
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val file = File(
-            applicationContext.getExternalFilesDir(
-                Environment.DIRECTORY_DOWNLOADS
-            ), fileToWrite
+            path, FILE_NAME
         )
         val result = Files.deleteIfExists(file.toPath())
-        Log.d("###", result.toString())
+        Log.d("###", "deleteIfExists: $result")
         try {
             val encryptedFile = EncryptedFile.Builder(
                 file,
@@ -49,8 +51,10 @@ class CypherViewModel(private val applicationContext: Application) :
                 flush()
                 close()
             }
-            // Check file in /sdcard/Android/data/com.mao.myapplication/files/Download
-            createAndDownloadFile(applicationContext, "my_sensitive_data2.txt", fileContent.toString())
+            // Check file in  /sdcard/Download or /sdcard/Android/data/com.mao.myapplication/files/Download
+            createAndDownloadFile(
+                applicationContext,
+            )
             return true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -58,16 +62,19 @@ class CypherViewModel(private val applicationContext: Application) :
         }
     }
 
-    fun decryptInputText() {
+    fun decryptInputText(uri: Uri): String {
         val keyGenParameterSpec = MasterKeys.AES256_GCM_SPEC
         val mainKeyAlias = MasterKeys.getOrCreate(keyGenParameterSpec)
 
-        val fileToRead = "my_sensitive_data.txt"
+        // /sdcard/Download/my_sensitive_data.txt
+        // content://com.android.providers.downloads.documents/document/raw%3A%2Fstorage%2Femulated%2F0%2FDownload%2Fmy_sensitive_data.txt
+        Log.d("###", "uri: $uri")
+        Log.d("###", "path:" + uri.path)
+
+        // TODO: Fix loading uri file logic
         val encryptedFile = EncryptedFile.Builder(
             File(
-                applicationContext.getExternalFilesDir(
-                    Environment.DIRECTORY_DOCUMENTS
-                ), fileToRead
+                PATH + FILE_NAME
             ),
             applicationContext,
             mainKeyAlias,
@@ -84,31 +91,31 @@ class CypherViewModel(private val applicationContext: Application) :
 
         val plaintext: ByteArray = byteArrayOutputStream.toByteArray()
         val message = String(plaintext)
-        Log.d("###", message)
+        Log.d("###", "message: $message")
+        return message
     }
 
-    private fun createAndDownloadFile(context: Context, fileName: String, content: String) {
-        // Step 1: Create a file in the external storage directory
-        val directory = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
-        val file = File(directory, fileName)
-        FileOutputStream(file).use {
-            it.write(content.toByteArray())
-        }
-        // Step 2: Notify the user that the file has been created and downloaded
+    private fun createAndDownloadFile(context: Context) {
+        // Notify the user that the file has been created and downloaded
         // Note: You can further customize the notification as per your requirement
         val notificationManager = NotificationManagerCompat.from(context)
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.cryptography)
             .setContentTitle("File Downloaded")
-            .setContentText("$fileName is downloaded to your device.")
+            .setContentText("$FILE_NAME is downloaded to your device.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
+
         if (ActivityCompat.checkSelfPermission(
                 applicationContext,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Toast.makeText(applicationContext, "Please grant the Notification permission", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                applicationContext,
+                "Please grant the Notification permission",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
         notificationManager.notify(0, notification)

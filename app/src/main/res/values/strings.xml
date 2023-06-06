@@ -5,8 +5,12 @@
     <string name="stop_capture">Stop Capture</string>
     <string name="take_a_picture">Take a picture</string>
     <string name="encryption_question">Do you want to encrypt the following text?</string>
+    <string name="decryption_question">Do you want to decrypt the file content?</string>
     <string name="encryption_yes">Yes</string>
     <string name="encryption_no">No</string>
     <string name="file_successful">The encrypted file was generated successfully!</string>
     <string name="file_failure">Sorry, there was an error saving the file</string>
+    <string name="encryption">Encryption</string>
+    <string name="decryption">Decryption</string>
+    <string name="open_file">Open file</string>
 </resources>
